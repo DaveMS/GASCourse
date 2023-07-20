@@ -4,12 +4,11 @@
 #include "Player/AuraPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Interaction/EnemyInterface.h"
 
 // Sets default values
 AAuraPlayerController::AAuraPlayerController()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 }
 
@@ -42,10 +41,10 @@ void AAuraPlayerController::SetupInputComponent()
 	
 }
 
-// Called every frame
-void AAuraPlayerController::Tick(float DeltaTime)
+void AAuraPlayerController::PlayerTick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	Super::PlayerTick(DeltaTime);
+	CursorTrace();
 }
 
 void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -63,5 +62,27 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
 	}
+}
+
+void AAuraPlayerController::CursorTrace()
+{
+	FHitResult CursorHit;
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	if (!CursorHit.bBlockingHit) return;
+
+	IEnemyInterface* TargetedEnemyLastFrame = TargetedEnemy;
+	TargetedEnemy = Cast<IEnemyInterface>(CursorHit.GetActor());
+
+	if (TargetedEnemyLastFrame)
+	{
+		if (TargetedEnemy == TargetedEnemyLastFrame) return;
+		TargetedEnemyLastFrame->UnHighlightActor();
+	}
+
+	if (TargetedEnemy)
+	{
+		TargetedEnemy->HighlightActor();
+	}
+	
 }
 
