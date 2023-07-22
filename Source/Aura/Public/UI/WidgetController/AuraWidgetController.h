@@ -48,9 +48,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FWidgetControllerParams Params);
+
+	virtual void BroadcastInitialValues();
 	
 protected:
 
+	//TODO Why are these not the Aura specific pointers? ie. AuraPlayerController, AuraPlayerState, UAuraAbilitySystemComponent. We seem to be casting them in child widget controllers.
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
 	TObjectPtr<APlayerController> PlayerController;
 
