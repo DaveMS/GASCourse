@@ -50,7 +50,8 @@ public:
 	void SetWidgetControllerParams(const FWidgetControllerParams Params);
 
 	virtual void BroadcastInitialValues();
-	
+
+	virtual void BindCallbacksToDependencies();
 protected:
 
 	//TODO Why are these not the Aura specific pointers? ie. AuraPlayerController, AuraPlayerState, UAuraAbilitySystemComponent. We seem to be casting them in child widget controllers.

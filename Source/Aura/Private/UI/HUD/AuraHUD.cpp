@@ -14,6 +14,7 @@ UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetCont
 		checkf(OverlayControllerClass, TEXT("Overlay controller class uninitialized. Populate BP_AuraHUD"));
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayControllerClass);
 		OverlayWidgetController->SetWidgetControllerParams(WCParams);
+		OverlayWidgetController->BindCallbacksToDependencies();
 	}
 	return OverlayWidgetController;
 }
