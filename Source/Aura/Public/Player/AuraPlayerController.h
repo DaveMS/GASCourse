@@ -41,6 +41,6 @@ private:
 
 	void CursorTrace();
 	
-	IEnemyInterface* TargetedEnemy;
+	TObjectPtr<IEnemyInterface> TargetedEnemy;
 };
 
