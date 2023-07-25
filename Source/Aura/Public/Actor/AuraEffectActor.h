@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ActiveGameplayEffectHandle.h"
 #include "AuraEffectActor.generated.h"
+
+class UAbilitySystemComponent;
+struct FActiveGameplayEffectHandle;
 
 UENUM(BlueprintType)
 enum class EEffectApplicationPolicy
@@ -21,6 +25,13 @@ enum class EEffectRemovalPolicy
 	DoNotRemove
 };
 
+struct FEffect
+{
+	TSubclassOf<UGameplayEffect> Effect;
+	EEffectApplicationPolicy EffectApplicationPolicy = EEffectApplicationPolicy::DoNotApply;
+	EEffectRemovalPolicy EffectRemovalPolicy = EEffectRemovalPolicy::RemoveOnEndOverlap;
+};
+
 class UGameplayEffect;
 
 UCLASS()
@@ -35,6 +46,9 @@ protected:
 
 	virtual void BeginPlay() override;
 
+
+	TArray<TSubclassOf<FEffect>> EffectClasses;
+	
 	//TODO why 2 different gameplay effect classes properties here? The reason given is that we might want to apply multiple Gameplay Effects.
 		// But this still limits us to 1 instant GE and 1 duration GE (well, not really as we can assign either to each. But it does restrict us to 2 GEs).
 		// Better to create an array of GE classes?
@@ -59,6 +73,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
 	EEffectRemovalPolicy InfiniteEffectRemovalPolicy = EEffectRemovalPolicy::RemoveOnEndOverlap;
 
+	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectHandles;
 	
 	// TODO why is GameplayEffectClass a parameter here? We should just use the GE classes in the above properties.
 	UFUNCTION(BlueprintCallable)
