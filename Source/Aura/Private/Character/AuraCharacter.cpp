@@ -4,6 +4,7 @@
 #include "Character/AuraCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
@@ -38,13 +39,17 @@ void AAuraCharacter::OnRep_PlayerState()
 void AAuraCharacter::InitAbilityActorInfo()
 {
 
-
+	Super::InitAbilityActorInfo();
+	
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
 	check(AuraPlayerState);
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = AuraPlayerState->GetAttributeSet();
 	AbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
 
+	//TODO Is this needed here? Why can't we bind these delegates in UAuraAbilitySystemComponent::BeginPlay rather than calling this AbilityActorInfoSet method from the Character class?
+	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
+	
 	//TODO Not a fan of initialising the HUD here. Doesn't feel like the Character should be responsible for this. The HUD should be able to get the PC, PS ASC and AS itself? Ie. Get PC from HUD, get possessed pawn, get ASC / AS from there. PS from PC?
 	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
 	{
