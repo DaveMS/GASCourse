@@ -39,5 +39,7 @@ protected:
 	
 	virtual void InitAbilityActorInfo();
 
+	// TODO: We are initialising our attributes using a GE, which is apparently the preferred way to do it for lots of people. Other ways are using a DT or manually using the setters.
+	//   is this the best way? Seems a bit odd.
 	void InitialisePrimaryAttributes() const;
 };
