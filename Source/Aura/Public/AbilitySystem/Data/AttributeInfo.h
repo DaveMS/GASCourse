@@ -40,4 +40,5 @@ public:
 	TArray<FAuraAttributeInfo> AttributeInformation;
 
 	FAuraAttributeInfo FindAttributeInfoForTag(const FGameplayTag& AttributeTag, bool bLogNotFound = false) const;
+	
 };
