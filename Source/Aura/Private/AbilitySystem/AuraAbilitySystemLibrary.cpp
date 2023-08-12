@@ -10,18 +10,42 @@
 
 UOverlayWidgetController* UAuraAbilitySystemLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
 {
-	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
+	if (AAuraHUD* AuraHUD = GetHUD(WorldContextObject))
 	{
-		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(PlayerController->GetHUD()))
-		{
-			AAuraPlayerState* PlayerState = PlayerController->GetPlayerState<AAuraPlayerState>();
-			UAbilitySystemComponent* AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
-			UAttributeSet* AttributeSet = PlayerState->GetAttributeSet();
+		const FWidgetControllerParams WidgetControllerParams = GetWidgetControllerParams(AuraHUD->GetOwningPlayerController());
+		return AuraHUD->GetOverlayWidgetController(WidgetControllerParams);
+	}
+	
+	return nullptr;
+}
 
-			const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState, AbilitySystemComponent, AttributeSet);
-			return AuraHUD->GetOverlayWidgetController(WidgetControllerParams);
-		}
+UAttributeMenuWidgetController* UAuraAbilitySystemLibrary::GetAttributeMenuWidgetController(const UObject* WorldContextObject)
+{
+	if (AAuraHUD* AuraHUD = GetHUD(WorldContextObject))
+	{
+		const FWidgetControllerParams WidgetControllerParams = GetWidgetControllerParams(AuraHUD->GetOwningPlayerController());
+		return AuraHUD->GetAttributeMenuWidgetController(WidgetControllerParams);
+	}
+	
+	return nullptr;
+}
+
+AAuraHUD* UAuraAbilitySystemLibrary::GetHUD(const UObject* WorldContextObject)
+{
+	if (const APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
+	{
+		return Cast<AAuraHUD>(PlayerController->GetHUD());
 	}
 
 	return nullptr;
+}
+
+FWidgetControllerParams UAuraAbilitySystemLibrary::GetWidgetControllerParams(APlayerController* Controller)
+{
+	AAuraPlayerState* PlayerState = Controller->GetPlayerState<AAuraPlayerState>();
+	UAbilitySystemComponent* AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
+	UAttributeSet* AttributeSet = PlayerState->GetAttributeSet();
+
+	const FWidgetControllerParams WidgetControllerParams(Controller, PlayerState, AbilitySystemComponent, AttributeSet);
+	return WidgetControllerParams;
 }
