@@ -17,7 +17,7 @@ public:
 	// Sets default values for this component's properties
 	UAuraInputComponent();
 
-	template<class UserClass typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
+	template<class UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
 	void BindAbilityActions(const UAuraInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc);
 	
 protected:
