@@ -4,6 +4,8 @@
 #include "Player/AuraPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "GameplayTagContainer.h"
+#include "Input/AuraInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 
 // Sets default values
@@ -36,9 +38,10 @@ void AAuraPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
-	
+	UAuraInputComponent* AuraInputComponent = CastChecked<UAuraInputComponent>(InputComponent);
+	AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+
+	AuraInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputPressed, &ThisClass::AbilityInputReleased, &ThisClass::AbilityInputHeld);
 }
 
 void AAuraPlayerController::PlayerTick(float DeltaTime)
@@ -84,5 +87,20 @@ void AAuraPlayerController::CursorTrace()
 		TargetedEnemy->HighlightActor();
 	}
 	
+}
+
+void AAuraPlayerController::AbilityInputPressed(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(1, 3, FColor::Red, *InputTag.ToString());
+}
+
+void AAuraPlayerController::AbilityInputReleased(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(2, 3, FColor::Blue, *InputTag.ToString());
+}
+
+void AAuraPlayerController::AbilityInputHeld(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(3, 3, FColor::Green, *InputTag.ToString());
 }
 
