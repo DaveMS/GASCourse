@@ -4,10 +4,12 @@
 #include "Player/AuraPlayerController.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AuraGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "Components/SplineComponent.h"
 #include "Input/AuraInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 
@@ -15,6 +17,8 @@
 AAuraPlayerController::AAuraPlayerController()
 {
 	bReplicates = true;
+	Spline = CreateDefaultSubobject<USplineComponent>("Spline");
+	 
 }
 
 // Called when the game starts or when spawned
@@ -104,11 +108,11 @@ TObjectPtr<UAuraAbilitySystemComponent> AAuraPlayerController::GetAbilitySystemC
 
 void AAuraPlayerController::AbilityInputPressed(FGameplayTag InputTag)
 {
-	if (const TObjectPtr<UAuraAbilitySystemComponent> AbilitySystemComponent = GetAbilitySystemComponent())
+	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
-		AbilitySystemComponent->AbilityInputTagHeld(InputTag);
+		bTargeting = TargetedEnemy ? true : false;
+		bAutoRunning = false;
 	}
-	
 }
 
 void AAuraPlayerController::AbilityInputReleased(FGameplayTag InputTag)
@@ -121,9 +125,28 @@ void AAuraPlayerController::AbilityInputReleased(FGameplayTag InputTag)
 
 void AAuraPlayerController::AbilityInputHeld(FGameplayTag InputTag)
 {
+	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB) && !bTargeting)
+	{
+		FollowTime += GetWorld()->GetDeltaSeconds();
+		FHitResult Hit;
+		if (GetHitResultUnderCursor(ECC_Visibility, false, Hit))
+		{
+			CachedDestination = Hit.Location;
+		}
+
+		if (APawn* ControlledPawn = GetPawn())
+		{
+			const FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+			ControlledPawn->AddMovementInput(WorldDirection);
+		}
+
+		return;
+	}
+	
 	if (const TObjectPtr<UAuraAbilitySystemComponent> AbilitySystemComponent = GetAbilitySystemComponent())
 	{
 		AbilitySystemComponent->AbilityInputTagHeld(InputTag);
 	}
+
 }
 
