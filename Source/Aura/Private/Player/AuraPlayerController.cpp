@@ -99,7 +99,6 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void AAuraPlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 
@@ -161,7 +160,6 @@ void AAuraPlayerController::AbilityInputReleased(FGameplayTag InputTag)
 					for (const FVector& Point : PathPoints)
 					{
 						Spline->AddSplinePoint(Point, ESplineCoordinateSpace::World);
-						DrawDebugSphere(GetWorld(), Point, 5.f, 8, FColor::Blue, false, 3);
 					}
 					// last point should be our destination
 					CachedDestination = Path->PathPoints[Path->PathPoints.Num() - 1];
@@ -185,10 +183,9 @@ void AAuraPlayerController::AbilityInputHeld(FGameplayTag InputTag)
 	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB) && !bTargeting)
 	{
 		FollowTime += GetWorld()->GetDeltaSeconds();
-		FHitResult Hit;
-		if (GetHitResultUnderCursor(ECC_Visibility, false, Hit))
+		if (CursorHit.bBlockingHit)
 		{
-			CachedDestination = Hit.Location;
+			CachedDestination = CursorHit.Location;
 		}
 
 		if (APawn* ControlledPawn = GetPawn())

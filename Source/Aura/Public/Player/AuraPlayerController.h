@@ -48,7 +48,8 @@ private:
 	void CursorTrace();
 	
 	IEnemyInterface* TargetedEnemy;
-
+	FHitResult CursorHit;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UAuraInputConfig> InputConfig;
 
@@ -74,5 +75,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> Spline;
+
+
 };
 
