@@ -53,10 +53,31 @@ void AAuraPlayerController::SetupInputComponent()
 	AuraInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputPressed, &ThisClass::AbilityInputReleased, &ThisClass::AbilityInputHeld);
 }
 
+void AAuraPlayerController::DoAutorun()
+{
+	if (APawn* ControlledPawn = GetPawn())
+	{
+		const FVector LocationOnSpline = Spline->FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+		const FVector Direction = Spline->FindDirectionClosestToWorldLocation(LocationOnSpline, ESplineCoordinateSpace::World);
+		ControlledPawn->AddMovementInput(Direction);
+
+		const float DistanceToDestination = (LocationOnSpline - CachedDestination).Length();
+		if (DistanceToDestination <= AutoRunAcceptanceRadius)
+		{
+			bAutoRunning = false;
+		}
+	}
+}
+
 void AAuraPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 	CursorTrace();
+
+	if (bAutoRunning)
+	{
+		DoAutorun();
+	}
 }
 
 void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -125,7 +146,13 @@ void AAuraPlayerController::AbilityInputReleased(FGameplayTag InputTag)
 		{
 			if (const APawn* ControllerPawn = GetPawn())
 			{
-				const UNavigationPath* Path = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControllerPawn->GetActorLocation(), CachedDestination);
+				FNavLocation PointToNavLocation;
+				if (!GetWorld()->GetNavigationSystem()->GetMainNavData()->ProjectPoint(CachedDestination, PointToNavLocation, FVector(500)))
+				{
+					return;
+				}
+				
+				const UNavigationPath* Path = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControllerPawn->GetActorLocation(), PointToNavLocation);
 				if (Path)
 				{
 					Spline->ClearSplinePoints();
@@ -136,7 +163,8 @@ void AAuraPlayerController::AbilityInputReleased(FGameplayTag InputTag)
 						Spline->AddSplinePoint(Point, ESplineCoordinateSpace::World);
 						DrawDebugSphere(GetWorld(), Point, 5.f, 8, FColor::Blue, false, 3);
 					}
-
+					// last point should be our destination
+					CachedDestination = Path->PathPoints[Path->PathPoints.Num() - 1];
 					bAutoRunning = true;
 				}
 			}

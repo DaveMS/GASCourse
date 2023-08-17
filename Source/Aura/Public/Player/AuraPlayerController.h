@@ -29,6 +29,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void SetupInputComponent() override;
+	void DoAutorun();
+
 public:
 	// Called every frame
 	virtual void PlayerTick(float DeltaTime) override;
