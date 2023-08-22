@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/AbilityTasks/AuraAbilityTask_TargetDataUnderMouse.h"
 
+#include "AbilitySystemComponent.h"
 #include "Player/AuraPlayerController.h"
 
 UAuraAbilityTask_TargetDataUnderMouse* UAuraAbilityTask_TargetDataUnderMouse::
@@ -15,10 +16,49 @@ CreateAuraAbilityTask_TargetDataUnderMouse(UGameplayAbility* OwningAbility)
 void UAuraAbilityTask_TargetDataUnderMouse::Activate()
 {
 	Super::Activate();
+
+	const bool bIsLocallyControlled = Ability->GetCurrentActorInfo()->IsLocallyControlled();
+
+	if (bIsLocallyControlled)
+	{
+		// Send target data to server
+		SendMouseCursorData();	
+	}
+	else
+	{
+		//TODO: We are on the server so listen for target data.
+	}
+	
+
+}
+
+void UAuraAbilityTask_TargetDataUnderMouse::SendMouseCursorData()
+{
+
+	FScopedPredictionWindow ScopedPrediction(AbilitySystemComponent.Get());
 	
 	if (const AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(Ability->GetCurrentActorInfo()->PlayerController.Get()))
 	{
-		const FVector Data = AuraPlayerController->GetTargetUnderMouseLocation();
-		ValidData.Broadcast(Data);
+		FHitResult CursorHit;
+		AuraPlayerController->GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+		FGameplayAbilityTargetData_SingleTargetHit* Data = new FGameplayAbilityTargetData_SingleTargetHit();
+		Data->HitResult = CursorHit;
+
+		FGameplayAbilityTargetDataHandle DataHandle;
+		DataHandle.Add(Data);
+		
+		AbilitySystemComponent->ServerSetReplicatedTargetData(
+			GetAbilitySpecHandle(),
+			GetActivationPredictionKey(),
+			DataHandle,
+			FGameplayTag(),
+			AbilitySystemComponent->ScopedPredictionKey);
+
+		if (ShouldBroadcastAbilityTaskDelegates())
+		{
+			ValidData.Broadcast(DataHandle);
+		}
 	}
+	
+
 }
