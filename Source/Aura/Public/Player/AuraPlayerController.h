@@ -35,6 +35,7 @@ public:
 	// Called every frame
 	virtual void PlayerTick(float DeltaTime) override;
 
+	FVector GetTargetUnderMouseLocation() const;; 
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Input")

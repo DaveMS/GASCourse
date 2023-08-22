@@ -34,6 +34,11 @@ void AAuraEnemy::UnHighlightActor()
 	Weapon->SetRenderCustomDepth(false);
 }
 
+FVector AAuraEnemy::GetLocation()
+{
+	return GetActorLocation();
+}
+
 int32 AAuraEnemy::GetCharacterLevel() const
 {
 	return Level;

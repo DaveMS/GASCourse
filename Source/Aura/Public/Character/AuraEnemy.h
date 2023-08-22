@@ -21,7 +21,7 @@ public:
 
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
-
+	virtual FVector GetLocation() override;
 	virtual int32 GetCharacterLevel() const override;
 	
 protected:

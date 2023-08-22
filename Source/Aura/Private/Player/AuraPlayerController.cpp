@@ -79,6 +79,14 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 		DoAutorun();
 	}
 }
+FVector AAuraPlayerController::GetTargetUnderMouseLocation() const
+{
+	if (TargetedEnemy)
+	{
+		return TargetedEnemy->GetLocation();
+	}
+	return FVector::ZeroVector;
+}
 
 void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 {

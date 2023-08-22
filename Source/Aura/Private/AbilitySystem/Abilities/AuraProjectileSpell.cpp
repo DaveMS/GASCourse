@@ -12,13 +12,18 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
                                            const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	
+}
 
-	if (HasAuthority(&ActivationInfo))
+void UAuraProjectileSpell::SpawnProjectile()
+{
+	AActor* AvatarActor = GetAvatarActorFromActorInfo();
+	if (AvatarActor->HasAuthority())
 	{
-		if (const ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo()))
+		if (const ICombatInterface* CombatInterface = Cast<ICombatInterface>(AvatarActor))
 		{
 			const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
-			const FTransform SpawnTransform = FTransform(GetAvatarActorFromActorInfo()->GetActorRotation(), SocketLocation);
+			const FTransform SpawnTransform = FTransform(AvatarActor->GetActorRotation(), SocketLocation);
 
 			//TODO set the projectile rotation to the clicked location.
 			
@@ -26,16 +31,12 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 				ProjectileClass,
 				SpawnTransform,
 				GetOwningActorFromActorInfo(),
-				Cast<APawn>(ActorInfo->AvatarActor.Get()),
+				Cast<APawn>(AvatarActor),
 				ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 				);
 
 			// TODO: Give the projectile a gameplay effect spec for causing damage
 			AuraProjectile->FinishSpawning(SpawnTransform);
 		}
-
-
-		
 	}
-	
 }

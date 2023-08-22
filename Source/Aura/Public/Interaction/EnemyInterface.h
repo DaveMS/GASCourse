@@ -25,5 +25,7 @@ public:
 
 	virtual void HighlightActor() = 0;
 	virtual void UnHighlightActor() = 0;
+
+	virtual FVector GetLocation() = 0;
 	
 };
