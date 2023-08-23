@@ -46,6 +46,7 @@ void UAuraAbilityTask_TargetDataUnderMouse::SendMouseCursorData()
 {
 
 	// TODO: Understand how prediction keys work in future courses?
+	// Explained quite well in 10-8 and GameplayPrediction.h
 	FScopedPredictionWindow ScopedPrediction(AbilitySystemComponent.Get());
 	
 	if (const AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(Ability->GetCurrentActorInfo()->PlayerController.Get()))
