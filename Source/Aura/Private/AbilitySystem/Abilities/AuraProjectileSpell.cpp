@@ -15,7 +15,7 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	
 }
 
-void UAuraProjectileSpell::SpawnProjectile()
+void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
 {
 	AActor* AvatarActor = GetAvatarActorFromActorInfo();
 	if (AvatarActor->HasAuthority())
@@ -23,7 +23,10 @@ void UAuraProjectileSpell::SpawnProjectile()
 		if (const ICombatInterface* CombatInterface = Cast<ICombatInterface>(AvatarActor))
 		{
 			const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
-			const FTransform SpawnTransform = FTransform(AvatarActor->GetActorRotation(), SocketLocation);
+
+			FRotator Rotation = (TargetLocation - SocketLocation).Rotation();
+			Rotation.Pitch = 0.f;
+			const FTransform SpawnTransform = FTransform(Rotation, SocketLocation);
 
 			//TODO set the projectile rotation to the clicked location.
 			

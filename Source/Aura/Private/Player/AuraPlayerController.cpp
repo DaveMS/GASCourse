@@ -49,6 +49,8 @@ void AAuraPlayerController::SetupInputComponent()
 
 	UAuraInputComponent* AuraInputComponent = CastChecked<UAuraInputComponent>(InputComponent);
 	AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+	AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AAuraPlayerController::ShiftPressed);
+	AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AAuraPlayerController::ShiftReleased);
 
 	AuraInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputPressed, &ThisClass::AbilityInputReleased, &ThisClass::AbilityInputHeld);
 }
@@ -147,7 +149,7 @@ void AAuraPlayerController::AbilityInputPressed(FGameplayTag InputTag)
 
 void AAuraPlayerController::AbilityInputReleased(FGameplayTag InputTag)
 {
-	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB) && !bTargeting)
+	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB) && !bTargeting && !bShiftKeyDown)
 	{
 		if (FollowTime <= ShortPressedThreshold)
 		{
@@ -188,7 +190,7 @@ void AAuraPlayerController::AbilityInputReleased(FGameplayTag InputTag)
 
 void AAuraPlayerController::AbilityInputHeld(FGameplayTag InputTag)
 {
-	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB) && !bTargeting)
+	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB) && !bTargeting && !bShiftKeyDown)
 	{
 		FollowTime += GetWorld()->GetDeltaSeconds();
 		if (CursorHit.bBlockingHit)
