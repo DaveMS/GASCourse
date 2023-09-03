@@ -25,6 +25,8 @@ public:
 	UAttributeSet* GetAttributeSet() const {return AttributeSet; }
 
 	virtual FVector GetCombatSocketLocation() const override;
+
+	
 protected:
 	virtual void BeginPlay() override;
 
