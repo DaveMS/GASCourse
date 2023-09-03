@@ -58,13 +58,16 @@ void AAuraEffectActor::RemoveEffectFromTarget(AActor* TargetActor, TSubclassOf<U
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	if (!IsValid(TargetASC)) return;
 
-	TArray<FActiveGameplayEffectHandle> EffectHandles = ActiveEffectHandles.FindChecked(TargetASC);
-	for (auto Handle : EffectHandles)
+	TArray<FActiveGameplayEffectHandle>* EffectHandles = ActiveEffectHandles.Find(TargetASC);
+	if (EffectHandles)
 	{
-		TargetASC->RemoveActiveGameplayEffect(Handle, 1);
-	}
+		for (auto Handle : *EffectHandles)
+		{
+			TargetASC->RemoveActiveGameplayEffect(Handle, 1);
+		}
 
-	ActiveEffectHandles.FindAndRemoveChecked(TargetASC);
+		ActiveEffectHandles.FindAndRemoveChecked(TargetASC);
+	}
 }
 
 void AAuraEffectActor::OnOverlap(AActor* TargetActor)
