@@ -3,6 +3,8 @@
 
 #include "Actor/AuraProjectile.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Aura/Aura.h"
 #include "Components/AudioComponent.h"
@@ -65,7 +67,13 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 	
 	if (HasAuthority())
 	{
+		if (UAbilitySystemComponent* TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
+		{
+			const FGameplayEffectSpec Effect = *DamageEffectSpecHandle.Data.Get();
+			TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(Effect);
+		}
 		Destroy();
+		
 	}else
 	{
 		// There is an edge case where the "Destroy" function is called on the server and replicated to the client before the OnSphereOverlap event is triggered on the client.

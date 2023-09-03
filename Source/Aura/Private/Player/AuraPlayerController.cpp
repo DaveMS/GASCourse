@@ -92,6 +92,8 @@ FVector AAuraPlayerController::GetTargetUnderMouseLocation() const
 
 void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 {
+	bAutoRunning = false;
+	
 	const FVector2d InputAxisVector = InputActionValue.Get<FVector2d>();
 
 	const FRotator Rotation = GetControlRotation();
