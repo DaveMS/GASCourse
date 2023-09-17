@@ -34,22 +34,25 @@ UAttributeMenuWidgetController* UAuraAbilitySystemLibrary::GetAttributeMenuWidge
 
 void UAuraAbilitySystemLibrary::InitialiseDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* AbilitySystemComponent)
 {
-	const AAuraGameModeBase* GameMode = CastChecked<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	const FCharacterClassDefaultInfo ClassDefaultInfo = GameMode->CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
+	const AAuraGameModeBase* GameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (GameMode)
+	{
+		const FCharacterClassDefaultInfo ClassDefaultInfo = GameMode->CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
 
-	const AActor* AvatarActor = AbilitySystemComponent->GetAvatarActor();
+		const AActor* AvatarActor = AbilitySystemComponent->GetAvatarActor();
 
-	FGameplayEffectContextHandle PrimaryAttributesEffectContextHandle = AbilitySystemComponent->MakeEffectContext();
-	PrimaryAttributesEffectContextHandle.AddSourceObject(AvatarActor);
-	AbilitySystemComponent->ApplyGameplayEffectToSelf(ClassDefaultInfo.PrimaryAttributes.GetDefaultObject(), Level, PrimaryAttributesEffectContextHandle);
+		FGameplayEffectContextHandle PrimaryAttributesEffectContextHandle = AbilitySystemComponent->MakeEffectContext();
+		PrimaryAttributesEffectContextHandle.AddSourceObject(AvatarActor);
+		AbilitySystemComponent->ApplyGameplayEffectToSelf(ClassDefaultInfo.PrimaryAttributes.GetDefaultObject(), Level, PrimaryAttributesEffectContextHandle);
 
-	FGameplayEffectContextHandle SecondaryAttributesEffectContextHandle = AbilitySystemComponent->MakeEffectContext();
-	SecondaryAttributesEffectContextHandle.AddSourceObject(AvatarActor);
-	AbilitySystemComponent->ApplyGameplayEffectToSelf(GameMode->CharacterClassInfo->SecondaryAttributes.GetDefaultObject(), Level, SecondaryAttributesEffectContextHandle);
+		FGameplayEffectContextHandle SecondaryAttributesEffectContextHandle = AbilitySystemComponent->MakeEffectContext();
+		SecondaryAttributesEffectContextHandle.AddSourceObject(AvatarActor);
+		AbilitySystemComponent->ApplyGameplayEffectToSelf(GameMode->CharacterClassInfo->SecondaryAttributes.GetDefaultObject(), Level, SecondaryAttributesEffectContextHandle);
 
-	FGameplayEffectContextHandle VitalAttributesEffectContextHandle = AbilitySystemComponent->MakeEffectContext();
-	VitalAttributesEffectContextHandle.AddSourceObject(AvatarActor);
-	AbilitySystemComponent->ApplyGameplayEffectToSelf(GameMode->CharacterClassInfo->VitalAttributes.GetDefaultObject(), Level, VitalAttributesEffectContextHandle);
+		FGameplayEffectContextHandle VitalAttributesEffectContextHandle = AbilitySystemComponent->MakeEffectContext();
+		VitalAttributesEffectContextHandle.AddSourceObject(AvatarActor);
+		AbilitySystemComponent->ApplyGameplayEffectToSelf(GameMode->CharacterClassInfo->VitalAttributes.GetDefaultObject(), Level, VitalAttributesEffectContextHandle);
+	}
 }
 
 AAuraHUD* UAuraAbilitySystemLibrary::GetHUD(const UObject* WorldContextObject)
